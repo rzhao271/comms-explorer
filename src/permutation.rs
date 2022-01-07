@@ -4,10 +4,10 @@ use std::fmt;
 
 #[derive(Debug)]
 pub struct Permutation {
-    cycles: Vec<Vec<i16>>
+    cycles: Vec<Vec<u16>>
 }
 
-fn traverse(elem: i16, cycles: &Vec<Vec<i16>>) -> i16 {
+fn traverse(elem: u16, cycles: &Vec<Vec<u16>>) -> u16 {
     let mut e = elem;
     for cycle in cycles {
         if let Some(pos) = cycle.iter().position(|&x| x == e) {
@@ -17,32 +17,32 @@ fn traverse(elem: i16, cycles: &Vec<Vec<i16>>) -> i16 {
     e
 }
 
-fn simplify(cycles: Vec<Vec<i16>>) -> Vec<Vec<i16>> {
+fn simplify(cycles: Vec<Vec<u16>>) -> Vec<Vec<u16>> {
     // Collect all the elements of all the cycles, 
     // and then sort them into a heap.
-    let mut b: BinaryHeap<i16> = BinaryHeap::new();
-    let mut visited: HashSet<i16> = HashSet::new();
+    let mut b: BinaryHeap<u16> = BinaryHeap::new();
+    let mut visited: HashSet<u16> = HashSet::new();
     for cycle in &cycles {
         for &e in cycle {
             visited.insert(e);
         }
     }
     for &e in &visited {
-        b.push(-e);
+        b.push(u16::MAX - e);
     }
 
     // Now find the new cycles traced by 
     // the popped elements.
-    let mut new_cycles: Vec<Vec<i16>> = Vec::new();
+    let mut new_cycles: Vec<Vec<u16>> = Vec::new();
     visited.clear();
     while let Some(mut elem) = b.pop() {
-        elem = -elem;
+        elem = u16::MAX - elem;
         if visited.contains(&elem) {
             continue;
         }
         visited.insert(elem);
         let first_elem = elem;
-        let mut new_cycle: Vec<i16> = vec![elem]; 
+        let mut new_cycle: Vec<u16> = vec![elem]; 
 
         elem = traverse(elem, &cycles);
         while elem != first_elem {
@@ -57,30 +57,78 @@ fn simplify(cycles: Vec<Vec<i16>>) -> Vec<Vec<i16>> {
     new_cycles
 }
 
+// Example: "(1 2 3)(4 5)" -> !vec["1 2 3", "4 5"]
+fn extract_cycles(s: &str) -> Result<Vec<&str>, String> {
+    fn extract_cycles_acc<'a>(s: &'a str, mut acc: Vec<&'a str>) -> Result<Vec<&'a str>, String> {
+        if s.trim().len() == 0 {
+            return Ok(acc);
+        }
+        let start_bracket_ind = s.find('(');
+        if start_bracket_ind.is_none() {
+            return Err("'(' not found even though there were characters after.".to_string());
+        }
+        let start_bracket_ind = start_bracket_ind.unwrap();
+        let end_bracket_ind = s.find(')');
+        if end_bracket_ind.is_none() {
+            return Err("')' not found even though there was '(' character before.".to_string());
+        }
+        let end_bracket_ind = end_bracket_ind.unwrap();
+        if start_bracket_ind > end_bracket_ind {
+            return Err("')' found before '(' when it is supposed to be after.".to_string());
+        }
+        acc.push(&s[start_bracket_ind + 1..end_bracket_ind]);
+        extract_cycles_acc(&s[end_bracket_ind + 1..], acc)
+    }
+    extract_cycles_acc(s, Vec::<&str>::new())
+}
+
 impl Permutation {
-    pub fn new(cycles: Vec<Vec<i16>>) -> Permutation {
+    pub fn new(cycles: Vec<Vec<u16>>) -> Permutation {
         Permutation {
             cycles: simplify(cycles)
         }
     }
 
+    pub fn from(s: &str) -> Result<Permutation, String> {
+        let mut cycles: Vec<Vec<u16>> = Vec::new();
+        match extract_cycles(&s) {
+            Ok(extracted_cycles) => {
+                for extracted_cycle in extracted_cycles {
+                    let mut cycle: Vec<u16> = Vec::new();
+                    for num in extracted_cycle.trim().split(" ") {
+                        if num == "" {
+                            continue;
+                        }
+                        if let Ok(num) = num.parse::<u16>() {
+                            cycle.push(num);
+                        } else {
+                            return Err(format!("Invalid cycle element '{}' in permutation string '{}'.", &num, &s));
+                        }
+                    }
+                    cycles.push(cycle);
+                }
+            },
+            Err(e) => {
+                return Err(e);
+            }
+        }
+        Ok(Permutation::new(cycles))
+    }
+
     pub fn compose(&self, other: &Permutation) -> Permutation {
-        let mut v: Vec<Vec<i16>> = Vec::new();
+        let mut v: Vec<Vec<u16>> = Vec::new();
         self.cycles.iter().for_each(|x| v.push(x.to_vec()));
         other.cycles.iter().for_each(|x| v.push(x.to_vec()));
-        Permutation {
-            cycles: simplify(v)
-        }
+        Permutation::new(v)
     }
 }
 
 impl PartialEq for Permutation {
     fn eq(&self, other: &Permutation) -> bool {
-        (self.cycles.len() == 0 && other.cycles.len() == 0) ||
-        (self.cycles == other.cycles)
+        self.cycles == other.cycles
     } 
     fn ne(&self, other: &Permutation) -> bool {
-        !self.eq(other)
+        !(self == other)
     }
 }
 
@@ -112,7 +160,6 @@ mod tests {
         assert_eq!(Permutation::new(vec![]), Permutation::new(vec![]));
         assert_eq!(Permutation::new(vec![vec![1]]), Permutation::new(vec![vec![1]]));
         assert_eq!(Permutation::new(vec![vec![1, 2], vec![3]]), Permutation::new(vec![vec![1, 2], vec![3]]));
-        assert_eq!(Permutation::new(vec![]), Permutation::new(vec![vec![1]]));
         assert_ne!(Permutation::new(vec![vec![1]]), Permutation::new(vec![vec![1, 2]]));
         assert_ne!(Permutation::new(vec![vec![1, 2], vec![3, 4]]), Permutation::new(vec![vec![1, 2], vec![3, 5]]));
     }
@@ -126,11 +173,33 @@ mod tests {
         assert_eq!(Permutation::new(vec![vec![1, 2], vec![1, 2]]), Permutation::new(vec![]));
         assert_eq!(Permutation::new(vec![vec![1, 2], vec![3, 2]]), Permutation::new(vec![vec![1, 3, 2]]));
         assert_eq!(Permutation::new(vec![vec![1, 2], vec![3, 4]]), Permutation::new(vec![vec![1, 2], vec![3, 4]]));
+        assert_eq!(Permutation::new(vec![vec![1, 2], vec![3, 4]]), Permutation::new(vec![vec![2, 1], vec![4, 3]]));
     }
 
     #[test]
     fn should_compose() {
-        // assert_eq!(); 
+        assert_eq!(Permutation::new(vec![vec![1, 2]]).compose(&Permutation::new(vec![vec![3, 2]])),
+            Permutation::new(vec![vec![1, 3, 2]]));
+        assert_eq!(Permutation::new(vec![vec![1]]).compose(&Permutation::new(vec![vec![2]])),
+            Permutation::new(vec![]));
+        assert_eq!(Permutation::new(vec![vec![1, 2]]).compose(&Permutation::new(vec![vec![1, 2]])),
+            Permutation::new(vec![]));
+        assert_eq!(Permutation::new(vec![vec![1, 2], vec![3, 4]]).compose(&Permutation::new(vec![vec![1, 2, 3]])),
+            Permutation::new(vec![vec![1, 3, 4]]));
+    }
+
+    #[test]
+    fn should_parse() {
+        assert_eq!(Permutation::from(""), Ok(Permutation::new(vec![])));
+        assert_eq!(Permutation::from("(1)"), Ok(Permutation::new(vec![])));
+        assert_eq!(Permutation::from("(1 2)"), Ok(Permutation::new(vec![vec![1, 2]])));
+        assert_eq!(Permutation::from("(1 2 3)(4 5)"), Ok(Permutation::new(vec![vec![1, 2, 3], vec![4, 5]])));
+        assert_eq!(Permutation::from("( 1 2  3)   (   4    5    )"), Ok(Permutation::new(vec![vec![1, 2, 3], vec![4, 5]])));
+        assert_eq!(Permutation::from("((1 2))").is_err(), true);
+        assert_eq!(Permutation::from("(1 2").is_err(), true);
+        assert_eq!(Permutation::from("(1 3) 2").is_err(), true);
+        assert_eq!(Permutation::from("1 )2").is_err(), true);
+        assert_eq!(Permutation::from(")1 2(").is_err(), true);
     }
 }
 
