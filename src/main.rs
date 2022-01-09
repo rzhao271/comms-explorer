@@ -3,84 +3,56 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;*/
 
+use std::env;
+use std::fs;
+use std::process;
+
 mod bfs;
+mod moves_map;
 mod permutation;
+mod target_cycle_lengths;
+
+use target_cycle_lengths::TargetCycleLengths;
 
 fn main() {
+    // Read args
+    let mut args = env::args();
+    args.next();
+    let moves_map_file_name = args.next().unwrap_or_else(|| {
+        println!("The first argument should be the moves map file name.");
+        process::exit(1);
+    });
+    let target_cycle_lengths = args.next().unwrap_or_else(|| {
+        println!("The second argument should be the target cycle lengths.");
+        process::exit(1);
+    });
+    if args.next().is_some() {
+        println!("There should be no additional arguments after the target cycle lengths.");
+        process::exit(1);
+    }
+
+    let moves_map = fs::read_to_string(&moves_map_file_name).unwrap_or_else(|e| {
+        println!("Error reading {}: {}", &moves_map_file_name, e.to_string());
+        process::exit(1);
+    });
+    /*
+    let moves_map = parse_moves_map(moves_map).unwrap_or_else(|e| {
+        println!("Error parsing moves map: {}", e.to_string());
+        process:exit(1);
+    }); 
+    */
+    let target_cycle_lengths = TargetCycleLengths::from(&target_cycle_lengths).unwrap_or_else(|e| {
+        println!("Error parsing target cycle lengths: {}", e.to_string());
+        process::exit(1);
+    });
+
+    // do_comms_search(moves_map, target_cycle_lengths.trim());
+    // TODO: parse moves_map_file_name into moves_map
+    // TODO: impl a get_nexts method for moves_map to send to BFS
+
 }
 
 /*
-fn read_file(path_name: &str) -> String {
-    // Take in a list of move-cycle mappings
-    let path = Path::new(path_name);
-    let path_display = path.display();
-    let mut file = match File::open(&path) {
-        Err(why) => panic!("Unable to open {}: {}", path_display, why),
-        Ok(file) => file
-    };
-    let mut move_cycles = String::new();
-    if let Err(why) = file.read_to_string(&mut move_cycles) {
-        panic!("Cannot read {}: {}", path_display, why);
-    }
-    move_cycles 
-}
-
-// Cycles = list of list of uints
-// This way we don't need to mess with strings
-type Cycle = Vec<u32>;
-type Cycles = Vec<Cycle>;
-
-let global_cycle_element_symbols: Vec<String> = Vec::new();
-
-fn initialize_global_symbols(s: &str) {
-}
-
-fn parse_cycles(s: &str) -> Cycles {
-    // keep looking for '(', ' ', and ')'
-    for b in s.chars() {
-        match b {
-            '(' => {
-            }
-            ' ' => {
-            } 
-            ')' => {
-            }
-            c => {
-                println!("Do something with {}", &c);
-            }
-        }
-    }
-    Vec::new()
-}
-
-
-fn parse_move_cycles(s: &str) -> HashMap<String, Cycles> {
-    // For each line, the first word is the move, and after that, parse the cycles
-    let mut move_cycles: HashMap<String, Cycles> = HashMap::new();
-
-    let lines = s.split("\n");
-    for line in lines {
-        let words: Vec<&str> = line.split(" ").collect();
-        let cube_move: &str = words.get(0).expect("Invalid move-cycle mapping");
-        let rest_str = &words[1..].concat();
-        let cycles = parse_cycles(&rest_str);
-        move_cycles.insert(cube_move.to_string(), cycles);
-    }
-    move_cycles    
-}
- 
-fn parse_target_cycle_lengths(s: &str) -> Vec<i32> {
-    let results: Vec<Result<i32, _>> = s.trim().split(' ').map(|s| s.parse()).collect();
-    let mut target_cycle_lengths: Vec<i32> = Vec::new();
-    for result in results {
-        match result {
-            Err(why) => panic!("Invalid target cycle length: {}", why),
-            Ok(target_cycle_length) => target_cycle_lengths.push(target_cycle_length)
-        }
-    }
-    target_cycle_lengths
-}
-
 struct Move {
     label: String
     cycles: Cycles

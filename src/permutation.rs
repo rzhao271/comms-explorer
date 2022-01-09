@@ -65,16 +65,16 @@ fn extract_cycles(s: &str) -> Result<Vec<&str>, String> {
         }
         let start_bracket_ind = s.find('(');
         if start_bracket_ind.is_none() {
-            return Err("'(' not found even though there were characters after.".to_string());
+            return Err("'(' not found even though there were characters after.".to_owned());
         }
         let start_bracket_ind = start_bracket_ind.unwrap();
         let end_bracket_ind = s.find(')');
         if end_bracket_ind.is_none() {
-            return Err("')' not found even though there was '(' character before.".to_string());
+            return Err("')' not found even though there was '(' character before.".to_owned());
         }
         let end_bracket_ind = end_bracket_ind.unwrap();
         if start_bracket_ind > end_bracket_ind {
-            return Err("')' found before '(' when it is supposed to be after.".to_string());
+            return Err("')' found before '(' when it is supposed to be after.".to_owned());
         }
         acc.push(&s[start_bracket_ind + 1..end_bracket_ind]);
         extract_cycles_acc(&s[end_bracket_ind + 1..], acc)
@@ -134,8 +134,8 @@ impl PartialEq for Permutation {
 
 impl fmt::Display for Permutation {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
-        for v in &self.cycles {
-            write!(f, "({})", v.iter().map(|x| x.to_string()).collect::<Vec<String>>().join(" "))?;
+        for c in &self.cycles {
+            write!(f, "({})", c.iter().map(|x| x.to_string()).collect::<Vec<String>>().join(" "))?;
         }
         Ok(())
     }
@@ -180,6 +180,10 @@ mod tests {
     fn should_compose() {
         assert_eq!(Permutation::new(vec![vec![1, 2]]).compose(&Permutation::new(vec![vec![3, 2]])),
             Permutation::new(vec![vec![1, 3, 2]]));
+        assert_eq!(Permutation::new(vec![vec![1, 2]]).compose(&Permutation::new(vec![])),
+            Permutation::new(vec![vec![1, 2]]));
+        assert_eq!(Permutation::new(vec![]).compose(&Permutation::new(vec![vec![1, 2]])),
+            Permutation::new(vec![vec![1, 2]]));
         assert_eq!(Permutation::new(vec![vec![1]]).compose(&Permutation::new(vec![vec![2]])),
             Permutation::new(vec![]));
         assert_eq!(Permutation::new(vec![vec![1, 2]]).compose(&Permutation::new(vec![vec![1, 2]])),
