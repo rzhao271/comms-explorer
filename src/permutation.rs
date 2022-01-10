@@ -125,6 +125,9 @@ impl Permutation {
 
 impl fmt::Display for Permutation {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
+        if self.cycles.len() == 0 {
+            return write!(f, "[id]");
+        }
         for c in &self.cycles {
             write!(f, "({})", c.iter().map(|x| x.to_string()).collect::<Vec<String>>().join(" "))?;
         }
@@ -139,7 +142,7 @@ mod tests {
 
     #[test]
     fn should_print_formatted_cycles() {
-        assert_eq!(Permutation::new(vec![]).to_string(), "");
+        assert_eq!(Permutation::new(vec![]).to_string(), "[id]");
         assert_eq!(Permutation::new(vec![vec![1, 2]]).to_string(), "(1 2)");
         assert_eq!(Permutation::new(vec![vec![2, 1]]).to_string(), "(1 2)");
         assert_eq!(Permutation::new(vec![vec![1, 2, 3], vec![4, 5, 6]]).to_string(), "(1 2 3)(4 5 6)");

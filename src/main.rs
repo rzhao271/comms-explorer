@@ -35,6 +35,13 @@ fn main() {
         process::exit(1);
     });
 
-    comms_explorer::find_algorithms(moves_map, target_cycle_lengths);
+    let algorithms = comms_explorer::find_algorithms(moves_map, target_cycle_lengths);
+    if algorithms.len() == 0 {
+        println!("No algorithm found!");
+        return;
+    }
+    for algorithm in algorithms {
+        println!("{}", algorithm);
+    }
 }
 
