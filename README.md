@@ -8,7 +8,7 @@ A Rust CLI program that finds algorithms to cycle pieces such that:
 ## Running the program
 
 ```sh
-cargo run -- \<moves-filename\> \<target-cycle-lengths\>
+cargo run -- <moves-filename> <target-cycle-lengths>
 ```
 
 Moves file format:
