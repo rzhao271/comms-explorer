@@ -2,9 +2,9 @@ use std::collections::BinaryHeap;
 use std::collections::HashSet;
 use std::fmt;
 
-#[derive(Debug)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct Permutation {
-    cycles: Vec<Vec<u16>>
+    pub cycles: Vec<Vec<u16>>
 }
 
 fn traverse(elem: u16, cycles: &Vec<Vec<u16>>) -> u16 {
@@ -123,15 +123,6 @@ impl Permutation {
     }
 }
 
-impl PartialEq for Permutation {
-    fn eq(&self, other: &Permutation) -> bool {
-        self.cycles == other.cycles
-    } 
-    fn ne(&self, other: &Permutation) -> bool {
-        !(self == other)
-    }
-}
-
 impl fmt::Display for Permutation {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         for c in &self.cycles {
@@ -144,7 +135,7 @@ impl fmt::Display for Permutation {
 
 #[cfg(test)]
 mod tests {
-    use crate::permutation::*;
+    use super::*;
 
     #[test]
     fn should_print_formatted_cycles() {

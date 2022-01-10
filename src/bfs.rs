@@ -36,7 +36,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::bfs::*;
+    use super::*;
 
     #[test]
     fn should_find_start_node() {
