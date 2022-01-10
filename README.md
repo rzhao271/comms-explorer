@@ -1,29 +1,34 @@
 # Comms Explorer
 
 A Rust CLI program that finds algorithms to cycle pieces such that:
-- The pieces are cycled in a way such that the lengths of the cycles match specified target cycle lengths (and the other pieces are in 1-cycles/not moved).
-- For each cycle matching that spec, the moves given to arrive at that cycle and the resulting cycles themselves are specified.
+- The pieces are cycled in a way such that the lengths of the non-trivial cycles match specified target cycle lengths
+- For the first permutation matching that spec, the moves given to arrive at that cycle and the resulting elements cycled are both printed out.
+- If no permutations match the target cycle lengths, a message is printed out saying that no match was found.
 
 ## Running the program
-cargo run -- moves-file.txt cycles-file.txt
+
+```sh
+cargo run -- \<moves-filename\> \<target-cycle-lengths\>
+```
 
 Moves file format:
 ```
 <move> <cycles>
 e.g.
-R (a b c d)
+R (1 2 3 4)
 ```
 
-Cycles file format:
-```
-<target cycle lengths>
-e.g.
-2 2
+Note that cycle elements must be positive integers.
+
+Target cycle lengths example:
+```sh
+"2 2"
 ```
 
 Output format:
 ```
 <cycles> <moves>
-e.g. (a c)(b d) RR
+e.g. (1 3)(2 4) R R
 ```
 
+or a message saying that no algorithm was found.
