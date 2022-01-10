@@ -29,5 +29,5 @@ pub fn find_algorithms(moves_map: MovesMap, target_cycle_lengths: TargetCycleLen
         target_cycle_lengths.target_lengths == cycle_lengths
     };
     let max_results = 1; // for now
-    bfs::bfs(Rc::new(start), get_nexts, is_wanted_node, max_results) 
+    bfs::bfs(Rc::new(start), get_nexts, is_wanted_node, max_results)
 }

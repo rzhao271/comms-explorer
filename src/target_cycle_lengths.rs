@@ -55,7 +55,7 @@ mod tests {
         assert_eq!(TargetCycleLengths::from("3"), Ok(TargetCycleLengths::new(vec![3])));
         assert_eq!(TargetCycleLengths::from("1 0 1"), Ok(TargetCycleLengths::new(vec![0, 1, 1])));
     }
-    
+
     #[test]
     fn should_fail_parse_target_cycle_lengths() {
         assert_eq!(TargetCycleLengths::from("1 -2").is_err(), true);

@@ -33,7 +33,7 @@ impl Algorithm {
 impl fmt::Display for Algorithm {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         write!(f, "{} {}", self.permutation, self.moves)
-    }    
+    }
 }
 
 impl PartialEq for Algorithm {

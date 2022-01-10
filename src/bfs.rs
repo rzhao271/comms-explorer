@@ -3,8 +3,8 @@ use std::collections::VecDeque;
 use std::hash::Hash;
 use std::rc::Rc;
 
-pub fn bfs<T, U, V>(start: Rc<T>, get_nexts: U, is_wanted_node: V, max_results: usize) -> Vec<T> 
-where 
+pub fn bfs<T, U, V>(start: Rc<T>, get_nexts: U, is_wanted_node: V, max_results: usize) -> Vec<T>
+where
     T: Clone + Eq + Hash,
     U: Fn(&T) -> Vec<T>,
     V: Fn(&T) -> bool

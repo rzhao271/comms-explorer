@@ -18,7 +18,7 @@ fn traverse(elem: u16, cycles: &Vec<Vec<u16>>) -> u16 {
 }
 
 fn simplify(cycles: Vec<Vec<u16>>) -> Vec<Vec<u16>> {
-    // Collect all the elements of all the cycles, 
+    // Collect all the elements of all the cycles,
     // and then sort them into a heap.
     let mut b: BinaryHeap<u16> = BinaryHeap::new();
     let mut visited: HashSet<u16> = HashSet::new();
@@ -31,7 +31,7 @@ fn simplify(cycles: Vec<Vec<u16>>) -> Vec<Vec<u16>> {
         b.push(u16::MAX - e);
     }
 
-    // Now find the new cycles traced by 
+    // Now find the new cycles traced by
     // the popped elements.
     let mut new_cycles: Vec<Vec<u16>> = Vec::new();
     visited.clear();
@@ -42,7 +42,7 @@ fn simplify(cycles: Vec<Vec<u16>>) -> Vec<Vec<u16>> {
         }
         visited.insert(elem);
         let first_elem = elem;
-        let mut new_cycle: Vec<u16> = vec![elem]; 
+        let mut new_cycle: Vec<u16> = vec![elem];
 
         elem = traverse(elem, &cycles);
         while elem != first_elem {
