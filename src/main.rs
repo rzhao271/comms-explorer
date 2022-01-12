@@ -2,8 +2,9 @@ use std::env;
 use std::fs;
 use std::process;
 
+use comms_explorer::AlgorithmResult;
 use comms_explorer::moves_map::MovesMap;
-use comms_explorer::target_cycle_lengths::TargetCycleLengths;
+use comms_explorer::cycle_lengths::CycleLengths;
 
 fn main() {
     // Read args
@@ -30,18 +31,24 @@ fn main() {
         println!("Error parsing moves map: {}", e);
         process::exit(1);
     });
-    let target_cycle_lengths = TargetCycleLengths::from(&target_cycle_lengths).unwrap_or_else(|e| {
+    let target_cycle_lengths = CycleLengths::from(&target_cycle_lengths).unwrap_or_else(|e| {
         println!("Error parsing target cycle lengths: {}", e);
         process::exit(1);
     });
 
     let algorithms = comms_explorer::find_algorithms(moves_map, target_cycle_lengths);
-    if algorithms.len() == 0 {
-        println!("No algorithm found!");
-        return;
-    }
-    for algorithm in algorithms {
-        println!("{}", algorithm);
+    match algorithms {
+        AlgorithmResult::FoundAlgorithms(algorithms) => {
+            println!("Found algorithms:");
+            for algorithm in algorithms {
+                println!("{}", algorithm);
+            }
+        },
+        AlgorithmResult::FoundCycleLengths(cycle_lengths) => {
+            println!("No algorithms found. Found cycle lengths:");
+            for cycle_length in cycle_lengths {
+                println!("{}", cycle_length);
+            }
+        }
     }
 }
-

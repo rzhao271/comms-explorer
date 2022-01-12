@@ -37,7 +37,7 @@ impl fmt::Display for Algorithm {
 }
 
 impl PartialEq for Algorithm {
-    fn eq(&self, other: &Algorithm) -> bool {
+    fn eq(&self, other: &Self) -> bool {
         self.permutation == other.permutation
     }
 }
@@ -57,14 +57,17 @@ mod tests {
 
     #[test]
     fn should_compose() {
-        assert_eq!(Algorithm::identity().compose("R", &Permutation::new(vec![vec![1, 2]])), Algorithm { permutation: Permutation::new(vec![vec![1, 2]]), moves: "R".to_owned() });
-        assert_eq!(Algorithm { permutation: Permutation::new(vec![vec![1, 3]]), moves: "L".to_owned() }.compose("R", &Permutation::new(vec![vec![1, 2]])), Algorithm { permutation: Permutation::new(vec![vec![1, 3, 2]]), moves: "L R".to_owned() });
+        assert_eq!(Algorithm::identity().compose("R", &Permutation::new(vec![vec![1, 2]])),
+            Algorithm { permutation: Permutation::new(vec![vec![1, 2]]), moves: "R".to_owned() });
+        assert_eq!(Algorithm { permutation: Permutation::new(vec![vec![1, 3]]), moves: "L".to_owned() }.compose("R", &Permutation::new(vec![vec![1, 2]])),
+            Algorithm { permutation: Permutation::new(vec![vec![1, 3, 2]]), moves: "L R".to_owned() });
     }
 
     #[test]
     fn should_display() {
         assert_eq!(Algorithm::identity().to_string(), "[id] ");
-        assert_eq!(Algorithm { permutation: Permutation::new(vec![vec![1, 2]]), moves: "R".to_owned() }.to_string(), "(1 2) R");
+        assert_eq!(Algorithm { permutation: Permutation::new(vec![vec![1, 2]]), moves: "R".to_owned() }.to_string(),
+            "(1 2) R");
     }
 
     #[test]

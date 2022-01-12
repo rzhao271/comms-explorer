@@ -4,7 +4,8 @@ use std::fmt;
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct Permutation {
-    pub cycles: Vec<Vec<u16>>
+    pub cycles: Vec<Vec<u16>>,
+    _private: ()
 }
 
 fn traverse(elem: u16, cycles: &Vec<Vec<u16>>) -> u16 {
@@ -85,7 +86,8 @@ fn extract_cycles(s: &str) -> Result<Vec<&str>, String> {
 impl Permutation {
     pub fn new(cycles: Vec<Vec<u16>>) -> Permutation {
         Permutation {
-            cycles: simplify(cycles)
+            cycles: simplify(cycles),
+            _private: ()
         }
     }
 
