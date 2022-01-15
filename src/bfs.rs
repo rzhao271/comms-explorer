@@ -54,7 +54,12 @@ where
             }
         }
     }
-    BFSResult::VisitedNodes(visited)
+
+    if results.len() > 0 {
+        BFSResult::FoundResults(results)
+    } else {
+        BFSResult::VisitedNodes(visited)
+    }
 }
 
 #[cfg(test)]

@@ -18,8 +18,18 @@ fn main() {
         println!("The second argument should be the target cycle lengths.");
         process::exit(1);
     });
+    let mut matches_to_find: usize = 1;
+    if let Some(matches_to_find_str) = args.next() {
+        match matches_to_find_str.parse() {
+            Ok(n) => matches_to_find = n,
+            Err(_) => {
+                println!("Unable to parse matches to find parameter {}", &matches_to_find);
+                process::exit(1);
+            }
+        }
+    }
     if args.next().is_some() {
-        println!("There should be no additional arguments after the target cycle lengths.");
+        println!("There should be no additional arguments after the number of matches to find.");
         process::exit(1);
     }
 
@@ -36,7 +46,7 @@ fn main() {
         process::exit(1);
     });
 
-    let algorithms = comms_explorer::find_algorithms(moves_map, target_cycle_lengths);
+    let algorithms = comms_explorer::find_algorithms(moves_map, target_cycle_lengths, matches_to_find);
     match algorithms {
         AlgorithmResult::FoundAlgorithms(algorithms) => {
             println!("Found algorithms:");

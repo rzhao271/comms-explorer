@@ -4,11 +4,11 @@ use std::fmt;
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct Permutation {
-    pub cycles: Vec<Vec<u16>>,
+    pub cycles: Vec<Vec<u8>>,
     _private: ()
 }
 
-fn traverse(elem: u16, cycles: &Vec<Vec<u16>>) -> u16 {
+fn traverse(elem: u8, cycles: &Vec<Vec<u8>>) -> u8 {
     let mut e = elem;
     for cycle in cycles {
         if let Some(pos) = cycle.iter().position(|&x| x == e) {
@@ -18,32 +18,32 @@ fn traverse(elem: u16, cycles: &Vec<Vec<u16>>) -> u16 {
     e
 }
 
-fn simplify(cycles: Vec<Vec<u16>>) -> Vec<Vec<u16>> {
+fn simplify(cycles: Vec<Vec<u8>>) -> Vec<Vec<u8>> {
     // Collect all the elements of all the cycles,
     // and then sort them into a heap.
-    let mut b: BinaryHeap<u16> = BinaryHeap::new();
-    let mut visited: HashSet<u16> = HashSet::new();
+    let mut b: BinaryHeap<u8> = BinaryHeap::new();
+    let mut visited: HashSet<u8> = HashSet::new();
     for cycle in &cycles {
         for &e in cycle {
             visited.insert(e);
         }
     }
     for &e in &visited {
-        b.push(u16::MAX - e);
+        b.push(u8::MAX - e);
     }
 
     // Now find the new cycles traced by
     // the popped elements.
-    let mut new_cycles: Vec<Vec<u16>> = Vec::new();
+    let mut new_cycles: Vec<Vec<u8>> = Vec::new();
     visited.clear();
     while let Some(mut elem) = b.pop() {
-        elem = u16::MAX - elem;
+        elem = u8::MAX - elem;
         if visited.contains(&elem) {
             continue;
         }
         visited.insert(elem);
         let first_elem = elem;
-        let mut new_cycle: Vec<u16> = vec![elem];
+        let mut new_cycle: Vec<u8> = vec![elem];
 
         elem = traverse(elem, &cycles);
         while elem != first_elem {
@@ -84,7 +84,7 @@ fn extract_cycles(s: &str) -> Result<Vec<&str>, String> {
 }
 
 impl Permutation {
-    pub fn new(cycles: Vec<Vec<u16>>) -> Permutation {
+    pub fn new(cycles: Vec<Vec<u8>>) -> Permutation {
         Permutation {
             cycles: simplify(cycles),
             _private: ()
@@ -92,16 +92,16 @@ impl Permutation {
     }
 
     pub fn from(s: &str) -> Result<Permutation, String> {
-        let mut cycles: Vec<Vec<u16>> = Vec::new();
+        let mut cycles: Vec<Vec<u8>> = Vec::new();
         match extract_cycles(&s) {
             Ok(extracted_cycles) => {
                 for extracted_cycle in extracted_cycles {
-                    let mut cycle: Vec<u16> = Vec::new();
+                    let mut cycle: Vec<u8> = Vec::new();
                     for num in extracted_cycle.trim().split(" ") {
                         if num == "" {
                             continue;
                         }
-                        if let Ok(num) = num.parse::<u16>() {
+                        if let Ok(num) = num.parse::<u8>() {
                             cycle.push(num);
                         } else {
                             return Err(format!("Invalid cycle element '{}' in permutation string '{}'.", &num, &s));
@@ -118,7 +118,7 @@ impl Permutation {
     }
 
     pub fn compose(&self, other: &Permutation) -> Permutation {
-        let mut v: Vec<Vec<u16>> = Vec::new();
+        let mut v: Vec<Vec<u8>> = Vec::new();
         self.cycles.iter().for_each(|x| v.push(x.to_vec()));
         other.cycles.iter().for_each(|x| v.push(x.to_vec()));
         Permutation::new(v)

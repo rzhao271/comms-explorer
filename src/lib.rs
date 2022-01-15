@@ -19,7 +19,7 @@ pub enum AlgorithmResult {
     FoundCycleLengths(Vec<CycleLengths>)
 }
 
-pub fn find_algorithms(moves_map: MovesMap, target_cycle_lengths: CycleLengths) -> AlgorithmResult {
+pub fn find_algorithms(moves_map: MovesMap, target_cycle_lengths: CycleLengths, matches_to_find: usize) -> AlgorithmResult {
     let start = Algorithm::identity();
     if target_cycle_lengths == CycleLengths::new(vec![]) {
         return AlgorithmResult::FoundAlgorithms(vec![Rc::new(start)]);
@@ -35,7 +35,7 @@ pub fn find_algorithms(moves_map: MovesMap, target_cycle_lengths: CycleLengths) 
         let cycle_lengths = alg.permutation.cycles.iter().map(|cycle| cycle.len()).collect::<Vec<usize>>();
         target_cycle_lengths == CycleLengths::new(cycle_lengths)
     };
-    let max_results = 1; // for now
+    let max_results = matches_to_find;
     let bfs_results = bfs::bfs(Rc::new(start), get_nexts, is_wanted_node, max_results);
     match bfs_results {
         BFSResult::FoundResults(results) => {
