@@ -35,7 +35,7 @@ pub fn find_algorithms(moves_map: MovesMap, target_cycle_lengths: CycleLengths, 
         let cycle_lengths = alg.permutation.cycles.iter().map(|cycle| cycle.len()).collect::<Vec<usize>>();
         target_cycle_lengths == CycleLengths::new(cycle_lengths)
     };
-    let max_results = matches_to_find;
+    let max_results = if matches_to_find > 0 { matches_to_find } else { 1 };
     let bfs_results = bfs::bfs(Rc::new(start), get_nexts, is_wanted_node, max_results);
     match bfs_results {
         BFSResult::FoundResults(results) => {

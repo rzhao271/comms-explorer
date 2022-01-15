@@ -8,7 +8,7 @@ A Rust CLI program that finds algorithms to cycle pieces such that:
 ## Running the program
 
 ```sh
-./comms-explorer <moves-filename> <target-cycle-lengths>
+./comms-explorer <moves-filename> <target-cycle-lengths> [<matches-to-find>]
 ```
 
 Where `<moves-filename>` is the filename of a plain text file,
@@ -17,15 +17,17 @@ where each line of the plain text file is one of the following:
 - A string representing the label given to a move, followed by a space, followed by the cycle elements
   that are cycled that move. Cycle elements must be positive integers.
 
-And where `<target-cycle-lengths>` is a string with a series of positive integers.
+Where `<target-cycle-lengths>` is a string with a series of positive integers,
+and where `<matches-to-find>` is an optional parameter, but when it shows up,
+it is a positive integer. Otherwise, it defaults to `1`.
 
-The program will try to find a combination of moves (an algorithm)
+The program will try to find `<matches-to-find>` combination(s) of moves
 from `<moves-filename>` such that the lengths of the resulting permutation cycles
 match the lengths given by `<target-cycle-lengths>`.
 One-cycles are excluded from consideration.
 
 If no algorithm is found, the program prints out the distinct cycle lengths of all found permutations
-in lexicographical order.
+in lexicographical order. Otherwise, the program prints out at most `<matches-to-find>` algorithms.
 
 ### Sample run
 
